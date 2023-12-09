@@ -3,7 +3,7 @@ import torch.nn as nn
 
 class TokenEmbeddings(nn.Module):
     
-    def __init__(self, d_model: int, vocab_size: int) -> nn.Embedding:
+    def __init__(self, d_model: int, vocab_size: int) -> None:
         
         '''
         Computes the token embeddings for input tokens
@@ -60,7 +60,7 @@ class PositionalEncoding(nn.Module):
         position_encodings = position_encodings.unsqueeze(0) # Shape: (1, seq_len, d_model)
         self.register_buffer(position_encodings) # to be a part of module state but not a parameter of module
         
-    def forward(self, x):
+    def forward(self, x: torch.Tensor):
         x = x + (self.position_encodings[:, :x.shape[1], :]).requires_grad_(False) # Adding positional encodings
-        pos_encoding = self.dropout(x)
+        pos_encoding = self.dropout(x) # Addding dropout to the position embedded input
         return pos_encoding
