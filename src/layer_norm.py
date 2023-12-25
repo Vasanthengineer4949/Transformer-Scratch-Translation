@@ -26,3 +26,28 @@ class LayerNorm(nn.Module):
         layer_norm_out = self.alpha * x_normalized + self.beta # Variance creation by alpha * x_normalized + beta
         return layer_norm_out
 
+class ResidualConnection(nn.Module):
+
+    def __init__(self, res_dropout: float):
+
+        '''
+        In the paper the Add and Layer Norm is handled by this Residual connection layer where the inputs is passed to a layer and that output is added with the input and is normalized at the layer level
+        x = LayerNorm(x + sublayer(x))
+
+        Args:
+        res_dropout - residual dropout probability
+
+        Returns:
+        add_layer_norm_out  - Add and Layer Norm output
+        '''
+
+        self.dropout_layer = nn.Dropout(res_dropout)
+        self.layer_norm_layer = LayerNorm(1e-6)
+
+    def forward(self, x, sublayer):
+
+        sublayer_out = sublayer(x)
+        add_out = x + sublayer_out
+        add_layer_norm_out = self.dropout_layer(self.layer_norm_layer(add_out))
+        return add_layer_norm_out
+        
