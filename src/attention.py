@@ -1,7 +1,8 @@
 import torch.nn as nn
 import math
+import torch
 
-class MultiHeadAttentionBlock(nn.Module):
+class MultiHeadAttention(nn.Module):
 
     def __init__(self, d_model: int, num_heads: int, attn_dropout: float) -> None:
 
@@ -27,7 +28,7 @@ class MultiHeadAttentionBlock(nn.Module):
         self.wo = nn.Linear(d_model, d_model, bias=False) # Wo -> Output projection
         self.dropout = nn.Dropout(attn_dropout)
 
-    def attention_calculation(self, query, key, value, mask, dropout: nn.Dropout):
+    def attention_calculation(self, query: torch.Tensor, key: torch.Tensor, value: torch.Tensor, mask: torch.Tensor):
 
         '''
         Function to calculate the attention by using Scaled Dot Product Attention
@@ -52,13 +53,13 @@ class MultiHeadAttentionBlock(nn.Module):
             attention_scores.masked_fill_(mask == 0, -1e9)
         attention_scores = attention_scores.softmax(dim=-1) # (bs, num_heads, seq_len, seq_len) # Apply softmax
 
-        if dropout is not None:
-            attention_scores = dropout(attention_scores)
+        if self.dropout is not None:
+            attention_scores = self.dropout(attention_scores)
 
         # (bs, h, seq_len, seq_len) --> (bs, h, seq_len, head_dim)
         return (attention_scores @ value), attention_scores
 
-    def forward(self, q, k, v, attn_mask):
+    def forward(self, q: torch.Tensor, k: torch.Tensor, v: torch.Tensor, attn_mask: torch.Tensor):
 
         query = self.wq(q) # (bs, seq_len, d_model)
         key = self.wk(k) # (bs, seq_len, d_model)
@@ -71,7 +72,7 @@ class MultiHeadAttentionBlock(nn.Module):
         value = value.view(value.shape[0], value.shape[1], self.num_heads, self.head_dim).transpose(1, 2)
 
         # Calculate attention
-        x, self.attention_scores = self.attention(query, key, value, attn_mask, self.dropout)
+        x, self.attention_scores = self.attention(query, key, value, attn_mask)
         
         # Concatenate all the heads together
         # (bs, num_heads, seq_len, head_dim) --> (bs, seq_len, num_heads, head_dim) --> (bs, seq_len, d_model)

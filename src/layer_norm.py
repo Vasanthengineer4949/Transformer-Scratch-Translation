@@ -3,7 +3,7 @@ import torch
 
 class LayerNorm(nn.Module):
 
-    def __init__(self, eps: float) -> None:
+    def __init__(self, d_model: int, eps: float) -> None:
 
         '''
         Normalizes the values layerwise by the formula: X-mean/(std + eps)
@@ -16,8 +16,8 @@ class LayerNorm(nn.Module):
         '''
 
         self.eps = eps
-        self.alpha = nn.Parameter(torch.ones(1)) # Since both alpha and beta are scalar in nature but learnable parameters
-        self.beta = nn.Parameter(torch.zeros(1))
+        self.alpha = nn.Parameter(torch.ones(d_model))
+        self.beta = nn.Parameter(torch.zeros(d_model))
 
     def forward(self, x:torch.Tensor):
         mean = x.mean(dim=-1, keepdim=True) # Finding mean across the last dimension while retaining the dimension
@@ -28,7 +28,7 @@ class LayerNorm(nn.Module):
 
 class ResidualConnection(nn.Module):
 
-    def __init__(self, res_dropout: float):
+    def __init__(self, d_model: int, res_dropout: float):
 
         '''
         In the paper the Add and Layer Norm is handled by this Residual connection layer where the inputs is passed to a layer and that output is added with the input and is normalized at the layer level
@@ -42,7 +42,7 @@ class ResidualConnection(nn.Module):
         '''
 
         self.dropout_layer = nn.Dropout(res_dropout)
-        self.layer_norm_layer = LayerNorm(1e-6)
+        self.layer_norm_layer = LayerNorm(d_model, 1e-6)
 
     def forward(self, x, sublayer):
 

@@ -1,7 +1,7 @@
 import torch.nn as nn
 import torch
 
-class FFBlock(nn.Module):
+class FeedForward(nn.Module):
 
     def __init__(self, d_model: int, ff_dropout: float) -> None:
 
