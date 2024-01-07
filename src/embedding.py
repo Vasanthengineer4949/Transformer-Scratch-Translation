@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from config import *
 
 class TokenEmbeddings(nn.Module):
     
@@ -64,3 +65,29 @@ class PositionalEncoding(nn.Module):
         x = x + (self.position_encodings[:, :x.shape[1], :]).requires_grad_(False) # Adding positional encodings
         pos_encoding = self.dropout(x) # Addding dropout to the position embedded input
         return pos_encoding
+    
+class InputEmbeddings(nn.Module):
+
+    def __init__(self):
+
+        '''
+        An Embedding module which will compute the input embedding by adding the token and position embedding of the input tokens
+
+        Returns:
+        inp_embedding - Input Embedding
+        '''
+        super().__init__()
+
+
+        self.d_model = D_MODEL
+        self.vocab_size = VOCAB_SIZE
+        self.seq_len = MAX_SEQ_LEN
+        self.dropout_p = FF_DROPOUT
+        self.token_embedding = TokenEmbeddings(self.d_model, self.vocab_size)
+        self.positional_encoding = PositionalEncoding(self.d_model, self.seq_len, self.dropout_p)
+
+    def forward(self, x: torch.Tensor):
+
+        token_embed_x = self.token_embedding(x)
+        inp_embedding = self.positional_encoding(token_embed_x)
+        return inp_embedding

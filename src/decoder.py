@@ -5,7 +5,7 @@ from layer_norm import ResidualConnection, LayerNorm
 import torch.nn as nn
 import torch
 
-class DecoderBlock:
+class DecoderBlock(nn.Module):
 
     def __init__(self):
 
@@ -33,7 +33,7 @@ class DecoderBlock:
         dec_block_out = self.res_connection3(cross_attn_out, self.feed_forward(cross_attn_out)) # Feed Forward output normalized and produces decoder output
         return dec_block_out
     
-class Decoder:
+class Decoder(nn.Module):
 
     def __init__(self, d_model: int, num_layers: int):
 

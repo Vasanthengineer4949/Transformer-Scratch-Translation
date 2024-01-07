@@ -5,7 +5,7 @@ from layer_norm import ResidualConnection, LayerNorm
 import torch.nn as nn
 import torch
 
-class EncoderBlock:
+class EncoderBlock(nn.Module):
 
     def __init__(self):
 
@@ -31,7 +31,7 @@ class EncoderBlock:
         enc_block_out = self.res_connection2(attn_out, self.feed_forward(attn_out)) # Feed Forward output normalized and produces encoder output
         return enc_block_out
     
-class Encoder:
+class Encoder(nn.Module):
 
     def __init__(self, d_model: int, num_layers: int):
 
@@ -50,7 +50,7 @@ class Encoder:
         self.layer_norm = LayerNorm(d_model, EPS)
 
     def forward(self, x:torch.Tensor, attn_mask: torch.Tensor):
-
+        
         for layer in self.layers:
             x = layer(x, attn_mask)
         encoder_out = self.layer_norm(x)
