@@ -10,7 +10,7 @@ class EncoderBlock:
     def __init__(self):
 
         '''
-        A Single Encoder block that can be stacked multiple times to form the encoder
+        A Single Encoder block that can be stacked multiple times to form the encoder which uses two main blocks: Self Attention  Feed Forward connected with some Residual Connections
 
         Returns:
         enc_block_out - Encoder Block Output
@@ -21,23 +21,37 @@ class EncoderBlock:
         self.attn_dropout = ATTN_DROPOUT # Attention dropout value
         self.ff_dropout = FF_DROPOUT # Feed forward dropout value
         self.res_dropout = RES_DROPOUT # Residual connection dropout value
-        self.attention = MultiHeadAttention(self.d_model, self.num_heads, self.attn_dropout) # Attention layer
+        self.self_attention = MultiHeadAttention(self.d_model, self.num_heads, self.attn_dropout) # Attention layer
         self.feed_forward = FeedForward(self.d_model, self.ff_dropout) # Feedforward layer
         self.res_connection1 = ResidualConnection(self.res_dropout) # Residual connection layer1
         self.res_connection2 = ResidualConnection(self.res_dropout) # Residual connection layer2
 
-    def forward(self, x, src_attn_mask):
-        attn_out = self.res_connection1(x, lambda x: self.attention(x, x, x, src_attn_mask)) # Attention and Normalized output
+    def forward(self, x: torch.Tensor, src_attn_mask: torch.Tensor):
+        attn_out = self.res_connection1(x, lambda x: self.self_attention(x, x, x, src_attn_mask)) # Attention and Normalized output
         enc_block_out = self.res_connection2(attn_out, self.feed_forward(attn_out)) # Feed Forward output normalized and produces encoder output
         return enc_block_out
     
 class Encoder:
 
-    def __init__(self, d_model: int, layers: nn.ModuleList):
+    def __init__(self, d_model: int, num_layers: int):
 
         '''
         Transformer encoder which has a stack of encoder blocks joined together
         
+        Args:
+        d_model: Embedding_dimension
+        num_layers: Number of layers in the stack
+
         Returns:
         encoder_out: Encoder output
         '''
+
+        self.layers = nn.ModuleList([EncoderBlock() for _ in range(num_layers)])
+        self.layer_norm = LayerNorm(d_model, EPS)
+
+    def forward(self, x:torch.Tensor, attn_mask: torch.Tensor):
+
+        for layer in self.layers:
+            x = layer(x, attn_mask)
+        encoder_out = self.layer_norm(x)
+        return encoder_out
