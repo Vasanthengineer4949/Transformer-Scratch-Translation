@@ -14,11 +14,12 @@ class FeedForward(nn.Module):
         
         Returns:
         ff_out - Feed Forward Block Output'''
+        super().__init__()
         self.d_model = d_model
         self.ff_dropout = ff_dropout
         self.d_ff = self.d_model * 4
         self.linear_1 = nn.Linear(self.d_model, self.d_ff) # Linear layer 1 
-        self.linear_2 = nn.Linear(self.d_ff. self.d_model) # Linear Layer 2
+        self.linear_2 = nn.Linear(self.d_ff, self.d_model) # Linear Layer 2
         self.ff_dropout_layer = nn.Dropout(self.ff_dropout) # Drouput layer with p = ff_dropout
 
     def forward(self, x:torch.Tensor):

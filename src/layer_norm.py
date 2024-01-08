@@ -14,7 +14,7 @@ class LayerNorm(nn.Module):
         Returns:
         layer_norm_out - Normalized layer value output
         '''
-
+        super().__init__()
         self.eps = eps
         self.alpha = nn.Parameter(torch.ones(d_model))
         self.beta = nn.Parameter(torch.zeros(d_model))
@@ -41,6 +41,7 @@ class ResidualConnection(nn.Module):
         add_layer_norm_out  - Add and Layer Norm output
         '''
 
+        super().__init__()
         self.dropout_layer = nn.Dropout(res_dropout)
         self.layer_norm_layer = LayerNorm(d_model, 1e-6)
 

@@ -72,7 +72,7 @@ class MultiHeadAttention(nn.Module):
         value = value.view(value.shape[0], value.shape[1], self.num_heads, self.head_dim).transpose(1, 2)
 
         # Calculate attention
-        x, self.attention_scores = self.attention(query, key, value, attn_mask)
+        x, self.attention_scores = self.attention_calculation(query, key, value, attn_mask)
         
         # Concatenate all the heads together
         # (bs, num_heads, seq_len, head_dim) --> (bs, seq_len, num_heads, head_dim) --> (bs, seq_len, d_model)

@@ -15,7 +15,7 @@ class DecoderBlock(nn.Module):
         Returns:
         dec_block_out - Decoder Block Output
         '''
-
+        super().__init__()
         self.d_model = D_MODEL # Embedding dimension
         self.num_heads = NUM_HEADS # Number of heads
         self.attn_dropout = ATTN_DROPOUT # Attention dropout value
@@ -24,13 +24,14 @@ class DecoderBlock(nn.Module):
         self.self_attention = MultiHeadAttention(self.d_model, self.num_heads, self.attn_dropout) # Self Attention layer
         self.cross_attention = MultiHeadAttention(self.d_model, self.num_heads, self.attn_dropout) # Cross Attention
         self.feed_forward = FeedForward(self.d_model, self.ff_dropout) # Feedforward layer
-        self.res_connection1 = ResidualConnection(self.res_dropout) # Residual connection layer1
-        self.res_connection2 = ResidualConnection(self.res_dropout) # Residual connection layer2
+        self.res_connection1 = ResidualConnection(self.d_model, self.res_dropout) # Residual connection layer1
+        self.res_connection2 = ResidualConnection(self.d_model, self.res_dropout) # Residual connection layer2
+        self.res_connection3 = ResidualConnection(self.d_model, self.res_dropout) # Residual connection layer2
 
     def forward(self, x: torch.Tensor, encoder_out: torch.Tensor, src_attn_mask: torch.Tensor, tgt_attn_mask: torch.Tensor):
-        self_attn_out = self.res_connection1(x, lambda x: self.attention(x, x, x, tgt_attn_mask)) # Self Attention and Normalized output
-        cross_attn_out = self.res_connection2(self_attn_out, lambda self_attn_out: self.attention(self_attn_out, encoder_out, encoder_out, src_attn_mask)) # Cross Attention and Normalized output
-        dec_block_out = self.res_connection3(cross_attn_out, self.feed_forward(cross_attn_out)) # Feed Forward output normalized and produces decoder output
+        self_attn_out = self.res_connection1(x, lambda x: self.self_attention(x, x, x, tgt_attn_mask)) # Self Attention and Normalized output
+        cross_attn_out = self.res_connection2(self_attn_out, lambda self_attn_out: self.cross_attention(self_attn_out, encoder_out, encoder_out, src_attn_mask)) # Cross Attention and Normalized output
+        dec_block_out = self.res_connection3(cross_attn_out, self.feed_forward) # Feed Forward output normalized and produces decoder output
         return dec_block_out
     
 class Decoder(nn.Module):
@@ -47,7 +48,7 @@ class Decoder(nn.Module):
         Returns:
         decoder_out: Decoder output
         '''
-
+        super().__init__()
         self.layers = nn.ModuleList([DecoderBlock() for _ in range(num_layers)])
         self.layer_norm = LayerNorm(d_model, EPS)
 

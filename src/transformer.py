@@ -3,6 +3,7 @@ from embedding import InputEmbeddings
 from encoder import Encoder
 from decoder import Decoder
 import torch.nn as nn
+import torch
 
 class Transformer(nn.Module):
 
@@ -42,4 +43,5 @@ def build_transformer_model():
 
     return transformer
 
-
+transformer = build_transformer_model()
+print(transformer(torch.arange(start=0, end=MAX_SEQ_LEN), torch.ones(MAX_SEQ_LEN), torch.arange(start=0, end=MAX_SEQ_LEN), torch.ones(MAX_SEQ_LEN)))
