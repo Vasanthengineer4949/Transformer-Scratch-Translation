@@ -1,7 +1,6 @@
 from datasets import load_dataset
 from torch.utils.data import Dataset
 from tokenizers import Tokenizer
-
 import torch
 
 class ClassificationDataset(Dataset):
@@ -25,10 +24,11 @@ class ClassificationDataset(Dataset):
         super().__init__()
 
         self.dataset_id = dataset_id
+        self.tokenizer = tokenizer
+        self.max_seq_len = max_seq_len
         self.src_cln_name = src_cln_name
         self.tgt_cln_name = tgt_cln_name
         self.dataset = load_dataset(dataset_id, split="train")["train"]
-        self.tokenizer = tokenizer
         self.sos_token = torch.tensor([tokenizer.token_to_id("[SOS]")]).to(torch.int64)
         self.eos_token = torch.tensor([tokenizer.token_to_id("[EOS]")]).to(torch.int64)
         self.pad_token = torch.tensor([tokenizer.token_to_id("[PAD]")]).to(torch.int64)
@@ -46,8 +46,8 @@ class ClassificationDataset(Dataset):
         encoder_inp_tokens = torch.tensor(self.tokenizer.encode(src_data).ids).to(torch.int64) # Tokenizing the source data
         decoder_inp_tokens = torch.tensor(self.tokenizer.encode(tgt_data).ids).to(torch.int64) # Tokenizing the target data
 
-        encoder_num_padding_tokens = self.seq_len - len(encoder_inp_tokens) - 2 # Calculating the number of source padding tokens
-        decoder_num_padding_tokens = self.seq_len - len(decoder_inp_tokens) - 1 # Calculating the number of target padding tokens
+        encoder_num_padding_tokens = self.max_seq_len - len(encoder_inp_tokens) - 2 # Calculating the number of source padding tokens
+        decoder_num_padding_tokens = self.max_seq_len - len(decoder_inp_tokens) - 1 # Calculating the number of target padding tokens
 
         encoder_inp_pad_tokens = torch.tensor([self.pad_token] * encoder_num_padding_tokens).to(torch.int64) # Encoder input padding tokens
         decoder_inp_pad_tokens = torch.tensor([self.pad_token] * decoder_num_padding_tokens).to(torch.int64) # Decoder input padding tokens 
