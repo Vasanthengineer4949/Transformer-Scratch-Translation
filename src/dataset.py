@@ -58,7 +58,7 @@ class ClassificationDataset(Dataset):
         label_tokens = torch.cat([decoder_inp_tokens, self.eos_token, label_pad_tokens], dim=0) # Label tokens padded
 
         encoder_attn_mask = (encoder_inp_tokens != self.pad_token).unsqueeze(0).unsqueeze(0).to(torch.int64) # Encoder attention mask
-        decoder_attn_mask = (decoder_inp_tokens != self.pad_token).unsqueeze(0).to(torch.int64) & torch.triu(torch.ones((1, decoder_inp_tokens.size(0), decoder_inp_tokens.size(0))), diagonal=1).type(torch.int)# Decoder attention mask
+        decoder_attn_mask = (decoder_inp_tokens != self.pad_token).unsqueeze(0).to(torch.int64) & (torch.triu(torch.ones((1, decoder_inp_tokens.size(0), decoder_inp_tokens.size(0))), diagonal=1).type(torch.int64))==0 # Decoder autoregressive attention mask
 
         model_inp = {}
         model_inp["encoder_input_ids"] = encoder_inp_tokens
@@ -69,7 +69,7 @@ class ClassificationDataset(Dataset):
         model_inp["source"] = src_data
         model_inp["target"] = tgt_data
 
-        return model_inp
+        return model_inp # Returning the model inputs
          
 
 
