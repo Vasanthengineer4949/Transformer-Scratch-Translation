@@ -44,4 +44,3 @@ def build_transformer_model():
     return transformer
 
 transformer = build_transformer_model()
-print(transformer(torch.arange(start=0, end=MAX_SEQ_LEN), torch.ones(MAX_SEQ_LEN), torch.arange(start=0, end=MAX_SEQ_LEN), torch.ones(MAX_SEQ_LEN)))

@@ -42,8 +42,6 @@ class MultiHeadAttention(nn.Module):
         mask: attention_mask to indicate if the calculation needs to be performed on a given token. For PAD token ignoring and autoregressive while cross attention
         dropout: attention dropout probability
         '''
-
-        head_dim = query.shape[-1]
         
         # (bs, num_heads, seq_len, head_dim) --> (bs, num_heads, seq_len, seq_len)
         attention_scores = (query @ key.transpose(-2, -1)) / math.sqrt(self.d_model)
