@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 from config import *
 from train_utils import TrainerUtils
 from torch.utils.data import DataLoader
@@ -40,10 +39,3 @@ trainer.train()
 
             
 
-=======
-import torch
-import torch.nn as nn
-from config import *
-from dataset import ClassificationDataset
-from transformer import build_transformer_model
->>>>>>> 8a91c34890dd32bd85267ccb2cb3c2a00c4bd01c

@@ -30048,7 +30048,6 @@
       "kernel": 29996,
       "kindred": 29997,
       "knitting": 29998,
-<<<<<<< HEAD
       "laboratories": 29999,
       "laboriously": 30000,
       "labs": 30001,
@@ -50050,9 +50049,6 @@
       "Planche": 49997,
       "Planner": 49998,
       "Planning": 49999
-=======
-      "laboratories": 29999
->>>>>>> 8a91c34890dd32bd85267ccb2cb3c2a00c4bd01c
     },
     "unk_token": "[UNK]"
   }

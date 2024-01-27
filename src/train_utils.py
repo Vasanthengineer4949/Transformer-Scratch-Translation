@@ -8,10 +8,7 @@ from dataset import ClassificationDataset
 from transformer import build_transformer_model
 from torch.utils.tensorboard import SummaryWriter
 from transformer import build_transformer_model
-<<<<<<< HEAD
 import os
-=======
->>>>>>> 8a91c34890dd32bd85267ccb2cb3c2a00c4bd01c
 
 class TrainerUtils:
 
@@ -28,7 +25,6 @@ class TrainerUtils:
         self.tgt_cln_name = TGT_CLN_NAME
         self.logging_dir = LOG_DIR
         self.batch_size = BATCH_SIZE
-<<<<<<< HEAD
         self.vocab_size = VOCAB_SIZE
 
         self.tokenizer = Tokenizer.from_file(self.tokenizer_path)
@@ -48,24 +44,6 @@ class TrainerUtils:
         # test_dataloader = DataLoader(self.test_classification_dataset, self.batch_size)
         # return train_dataloader, test_dataloader
         return train_dataloader, train_dataloader
-=======
-
-        self.tokenizer = Tokenizer.from_file(self.tokenizer_path)
-        self.transformer_model = build_transformer_model()
-        self.dataset = load_dataset(self.dataset_id, split="train")["train"]
-
-        self.train_dataset, self.test_dataset = self.dataset.train_test_split(test_size=0.15, stratify_by_column=self.tgt_cln_name, shuffle=True)
-        self.train_classification_dataset = ClassificationDataset(self.train_dataset, self.tokenizer, self.max_seq_len, self.src_cln_name, self.tgt_cln_name)
-        self.test_classification_dataset = ClassificationDataset(self.test_dataset, self.tokenizer, self.max_seq_len, self.src_cln_name, self.tgt_cln_name)
-
-        self.writer = SummaryWriter(self.logging_dir, comment="First implementation")
-        self.optimizer = torch.optim.Adam(self.transformer_model.parameters(), lr = LR)
-
-    def load_dataloaders(self):
-        train_dataloader = DataLoader(self.train_classification_dataset, batch_size=self.batch_size, shuffle=True)
-        test_dataloader = DataLoader(self.test_classification_dataset, self.batch_size)
-        return train_dataloader, test_dataloader
->>>>>>> 8a91c34890dd32bd85267ccb2cb3c2a00c4bd01c
     
     def compute_loss(self, logits: torch.Tensor, labels: torch.Tensor):
         '''
@@ -78,14 +56,10 @@ class TrainerUtils:
         Returns:
         loss: Cross Entropy Loss
         '''
-<<<<<<< HEAD
         logits = logits.view(-1, self.vocab_size)
         labels = labels.view(-1)
         loss = self.loss_fn(logits, labels)
         return loss
-=======
-        logits = logits.view(-1, self.tokenizer.get_vocab_size())
->>>>>>> 8a91c34890dd32bd85267ccb2cb3c2a00c4bd01c
 
     def generate(self, model: nn.Module, source: torch.Tensor, src_attn_mask: torch.Tensor, tokenizer: Tokenizer):
 
@@ -145,7 +119,6 @@ class TrainerUtils:
         train_dataloader, test_dataloader = self.load_dataloaders()
         return self.transformer_model, train_dataloader, test_dataloader, self.writer, self.optimizer
     
-<<<<<<< HEAD
     def train_one_step(self, model_inp: dict, model: nn.Module, optimizer:torch.optim.Adam):
         
         '''
@@ -236,8 +209,6 @@ class TrainerUtils:
 
 
     
-=======
->>>>>>> 8a91c34890dd32bd85267ccb2cb3c2a00c4bd01c
     
     
 
