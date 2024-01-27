@@ -1,9 +1,5 @@
-<<<<<<< HEAD
 from datasets import Dataset as HFDataset
 from datasets import load_dataset
-=======
-from datasets import Dataset
->>>>>>> 8a91c34890dd32bd85267ccb2cb3c2a00c4bd01c
 from torch.utils.data import Dataset
 from tokenizers import Tokenizer
 import pandas as pd
@@ -11,7 +7,7 @@ import torch
 
 class ClassificationDataset(Dataset):
 
-    def __init__(self, dataset: Dataset, tokenizer: Tokenizer, max_seq_len: int,  src_cln_name: str, tgt_cln_name: str):
+    def __init__(self, dataset_id: str, tokenizer: Tokenizer, max_seq_len: int,  src_cln_name: str, tgt_cln_name: str):
 
         '''
         A Pytorch Dataset class to load the classification dataset from huggingface with all the preprocessing and tokenization completed.
@@ -34,14 +30,9 @@ class ClassificationDataset(Dataset):
         self.max_seq_len = max_seq_len
         self.src_cln_name = src_cln_name
         self.tgt_cln_name = tgt_cln_name
-<<<<<<< HEAD
         self.dataset_id = dataset_id
         self.dataset = HFDataset.from_pandas(pd.read_parquet(dataset_id).sample(100))
         # self.dataset = load_dataset(self.dataset_id, split="train")
-=======
-        self.dataset = dataset
-        # self.dataset = load_dataset(dataset_id, split="train")["train"]
->>>>>>> 8a91c34890dd32bd85267ccb2cb3c2a00c4bd01c
         self.sos_token = torch.tensor([tokenizer.token_to_id("[SOS]")]).to(torch.int64)
         self.eos_token = torch.tensor([tokenizer.token_to_id("[EOS]")]).to(torch.int64)
         self.pad_token = torch.tensor([tokenizer.token_to_id("[PAD]")]).to(torch.int64)
@@ -86,9 +77,3 @@ class ClassificationDataset(Dataset):
         model_inp["target"] = tgt_data
 
         return model_inp # Returning the model inputs
-         
-
-
-
-
-        
