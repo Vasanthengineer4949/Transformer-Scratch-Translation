@@ -1,6 +1,6 @@
 D_MODEL = 512 # Dimension of input token representation - embeddings
 VOCAB_SIZE = 50000 # Number of tokens in vocabulary
-MAX_SEQ_LEN = 128 # Maximum Sequence Length of Input and Output Sequence
+MAX_SEQ_LEN = 256 # Maximum Sequence Length of Input and Output Sequence
 NUM_LAYERS = 6 # Number of encoder and decoder stacks
 ATTN_DROPOUT = 0.2 # Quantify the dropout of how much in attention
 EPS = 1e-6 # A small value to avoid zero division error while normalization

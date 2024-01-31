@@ -31,7 +31,7 @@ class ClassificationDataset(Dataset):
         self.src_cln_name = src_cln_name
         self.tgt_cln_name = tgt_cln_name
         self.dataset_id = dataset_id
-        self.dataset = HFDataset.from_pandas(pd.read_parquet(dataset_id).sample(100))
+        self.dataset = HFDataset.from_pandas(pd.read_parquet(dataset_id))
         # self.dataset = load_dataset(self.dataset_id, split="train")
         self.sos_token = torch.tensor([tokenizer.token_to_id("[SOS]")]).to(torch.int64)
         self.eos_token = torch.tensor([tokenizer.token_to_id("[EOS]")]).to(torch.int64)
@@ -46,12 +46,24 @@ class ClassificationDataset(Dataset):
         src_data = data[self.src_cln_name] # Fetching the source data
         tgt_data = data[self.tgt_cln_name] # Fetching the target data
 
+        if tgt_data == 1:
+            tgt_data = "Positive"
+        
+        else:
+            tgt_data = "Negative"
+
         encoder_inp_tokens = torch.tensor(self.tokenizer.encode(src_data).ids).to(torch.int64) # Tokenizing the source data
         decoder_inp_tokens = torch.tensor(self.tokenizer.encode(str(tgt_data)).ids).to(torch.int64) # Tokenizing the target data
 
-        if encoder_inp_tokens.size(0) > self.max_seq_len:
-            encoder_inp_tokens = encoder_inp_tokens[:self.max_seq_len-2]
-            print(encoder_inp_tokens.shape)
+        if encoder_inp_tokens.size(0) > self.max_seq_len-2:
+            try:
+                encoder_inp_tokens = encoder_inp_tokens[:self.max_seq_len-2]
+            except:
+                encoder_inp_tokens_lst = []
+                for i in range(self.max_seq_len-3):
+                    encoder_inp_tokens_lst.append(encoder_inp_tokens[i])
+                encoder_inp_tokens = torch.Tensor(encoder_inp_tokens_lst)
+                print("Except: ", encoder_inp_tokens_lst.shape)
 
         encoder_num_padding_tokens = self.max_seq_len - len(encoder_inp_tokens) - 2 # Calculating the number of source padding tokens
         decoder_num_padding_tokens = self.max_seq_len - len(decoder_inp_tokens) - 1 # Calculating the number of target padding tokens

@@ -84,7 +84,6 @@ class TrainerUtils:
         decoder_inp = torch.empty(1, 1).type_as(source).fill_(sos_idx).to(device)
 
         while True:
-
             if decoder_inp.size(1) == self.max_seq_len:
                 break
 
@@ -92,16 +91,16 @@ class TrainerUtils:
 
             out = model(source, src_attn_mask, decoder_inp, tgt_attn_mask)
 
-            logits = torch.softmax(out, dim=1)
+            logits = torch.softmax(out, dim=2)
 
-            next_word_logit_argmax = torch.argmax(logits, dim=1)
+            next_word_logit_argmax = torch.argmax(logits, dim=2)
 
             decoder_inp = torch.cat([decoder_inp, torch.empty(1, 1).type_as(source).fill_(next_word_logit_argmax.item()).to(device)], dim=1)
             
             if next_word_logit_argmax == eos_idx:
                 break
-
-        model_out = tokenizer.decode_batch(decoder_inp)
+        
+        model_out = tokenizer.decode_batch(decoder_inp.tolist())
 
         return model_out
 
@@ -133,11 +132,11 @@ class TrainerUtils:
         loss: Loss of that step
         '''
 
-        src_x = model_inp["encoder_input_ids"] 
-        src_attn_mask = model_inp["encoder_attention_mask"] 
-        tgt_x = model_inp["decoder_input_ids"] 
-        tgt_attn_mask = model_inp["decoder_attention_mask"]
-        labels = model_inp["labels"]
+        src_x = model_inp["encoder_input_ids"].to("cuda")
+        src_attn_mask = model_inp["encoder_attention_mask"].to("cuda")
+        tgt_x = model_inp["decoder_input_ids"].to("cuda")
+        tgt_attn_mask = model_inp["decoder_attention_mask"].to("cuda")
+        labels = model_inp["labels"].to("cuda")
 
         model_logits = model(src_x, src_attn_mask, tgt_x, tgt_attn_mask)
         
