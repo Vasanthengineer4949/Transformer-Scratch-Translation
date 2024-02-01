@@ -35,4 +35,4 @@ def translate(sentence: str):
         model_out = train_utils.generate(model=model, source=source, src_attn_mask=source_mask, tokenizer=tokenizer)
     return model_out
 
-print(translate("I am not a very good a student."))
+print(translate("I am feeling bad"))

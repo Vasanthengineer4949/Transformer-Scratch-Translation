@@ -31,7 +31,7 @@ class ClassificationDataset(Dataset):
         self.src_cln_name = src_cln_name
         self.tgt_cln_name = tgt_cln_name
         self.dataset_id = dataset_id
-        self.dataset = HFDataset.from_pandas(pd.read_parquet(dataset_id).sample(10000))
+        self.dataset = HFDataset.from_pandas(pd.read_parquet(dataset_id).sample(100))
         # self.dataset = load_dataset(self.dataset_id, split="train")
         self.sos_token = torch.tensor([tokenizer.token_to_id("[SOS]")]).to(torch.int64)
         self.eos_token = torch.tensor([tokenizer.token_to_id("[EOS]")]).to(torch.int64)
@@ -44,13 +44,13 @@ class ClassificationDataset(Dataset):
 
         data = self.dataset[index]
         src_data = data[self.src_cln_name] # Fetching the source data
-        tgt_data = data[self.src_cln_name] # Fetching the target data
+        tgt_data = data[self.tgt_cln_name] # Fetching the target data
 
-        # if tgt_data == 1:
-        #     tgt_data = "Positive"
+        if tgt_data == 1:
+            tgt_data = "Positive"
         
-        # else:
-        #     tgt_data = "Negative"
+        else:
+            tgt_data = "Negative"
 
         encoder_inp_tokens = torch.tensor(self.tokenizer.encode(src_data).ids).to(torch.int64) # Tokenizing the source data
         decoder_inp_tokens = torch.tensor(self.tokenizer.encode(str(tgt_data)).ids).to(torch.int64) # Tokenizing the target data
@@ -71,7 +71,7 @@ class ClassificationDataset(Dataset):
         encoder_inp_tokens = torch.cat([self.sos_token, encoder_inp_tokens, self.eos_token, encoder_inp_pad_tokens], dim=0) # Encoder input tokens padded
         decoder_inpp_tokens = torch.cat([self.sos_token, decoder_inp_tokens, decoder_inp_pad_tokens], dim=0) # Decoder input tokens padded
         label_tokens = torch.cat([decoder_inp_tokens, self.eos_token, label_pad_tokens], dim=0) # Label tokens padded
-
+        
         encoder_attn_mask = (encoder_inp_tokens != self.pad_token).unsqueeze(0).unsqueeze(0).to(torch.int64) # Encoder attention mask
         auto_regressive_mask = torch.triu(torch.ones((1, decoder_inpp_tokens.size(0), decoder_inpp_tokens.size(0))), diagonal=1).type(torch.int64)
         decoder_attn_mask = (decoder_inpp_tokens != self.pad_token).unsqueeze(0).to(torch.int64) & auto_regressive_mask==0 # Decoder autoregressive attention mask

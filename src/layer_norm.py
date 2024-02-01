@@ -47,8 +47,9 @@ class ResidualConnection(nn.Module):
 
     def forward(self, x, sublayer):
 
-        sublayer_out = sublayer(x)
+        sublayer_out = self.dropout_layer(sublayer(self.layer_norm_layer(x)))
         add_out = x + sublayer_out
-        add_layer_norm_out = self.dropout_layer(self.layer_norm_layer(add_out))
+        # add_layer_norm_out = self.dropout_layer(self.layer_norm_layer(add_out))
+        add_layer_norm_out = add_out
         return add_layer_norm_out
         

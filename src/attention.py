@@ -74,7 +74,7 @@ class MultiHeadAttention(nn.Module):
         
         # Concatenate all the heads together
         # (bs, num_heads, seq_len, head_dim) --> (bs, seq_len, num_heads, head_dim) --> (bs, seq_len, d_model)
-        x = x.transpose(1, 2).contiguous().view(x.shape[0], -1, self.num_heads * self.head_dim)
+        x = x.transpose(1, 2).contiguous().view(x.shape[0], -1, self.d_model)
 
         # Learn all the features concatenated by output projection layer since all heads are concatenated
         # (bs, seq_len, d_model)  

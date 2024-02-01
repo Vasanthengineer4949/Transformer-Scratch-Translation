@@ -74,35 +74,34 @@ class TrainerUtils:
         Returns:
         model_out: Model output
         '''
-
+        i = 0
         device = "cpu"
 
         sos_idx = tokenizer.token_to_id("[SOS]")
         eos_idx = tokenizer.token_to_id("[EOS]")
 
-        decoder_inp = torch.empty(1, 1).type_as(source).fill_(sos_idx).to(device)
+        decoder_inp = torch.empty(1, 1).fill_(sos_idx).type_as(source).to(device)
 
         while True:
             if decoder_inp.size(1) == self.max_seq_len:
                 break
 
-            tgt_attn_mask = torch.triu(torch.ones((1, decoder_inp.size(1), decoder_inp.size(1))), diagonal=1).type(torch.int64)
+            tgt_attn_mask = torch.triu(torch.ones((1, decoder_inp.size(1), decoder_inp.size(1))), diagonal=1).type(torch.int64).type_as(src_attn_mask).to(device)
 
             out = model(source, src_attn_mask, decoder_inp, tgt_attn_mask)
 
             logits = torch.softmax(out, dim=2)
 
-            print(logits[0][0][tokenizer.token_to_id("Positive")])
-            print(logits[0][0][2])
-
-            next_word_logit_argmax = torch.argmax(out, dim=2)
+            next_word_logit_argmax = torch.argmax(logits, dim=2)
+            next_word_logit_argmax = next_word_logit_argmax[0][-1]
 
             decoder_inp = torch.cat([decoder_inp, torch.empty(1, 1).type_as(source).fill_(next_word_logit_argmax.item()).to(device)], dim=1)
+            i = i+1
             
             if next_word_logit_argmax == eos_idx:
                 break
         
-        model_out = tokenizer.decode_batch(decoder_inp.tolist())
+        model_out = tokenizer.decode_batch(decoder_inp.tolist())[0]
 
         return model_out
 
