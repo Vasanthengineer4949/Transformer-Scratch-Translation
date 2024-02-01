@@ -8,12 +8,11 @@ train_utils = TrainerUtils()
 def translate(sentence: str):
     # Define the device, tokenizers, and model
     device = "cpu"
-    print("Using device:", device)
     tokenizer = Tokenizer.from_file("tokenizer.json")
     model = build_transformer_model().to(device)
 
     # Load the pretrained weights
-    state = torch.load("transformer_classifier/epoch-3-checkpoint.pth")
+    state = torch.load("transformer_classifier/epoch-4-checkpoint.pth")
     model.load_state_dict(state['model'])
 
     # if the sentence is a number use it as an index to the test set

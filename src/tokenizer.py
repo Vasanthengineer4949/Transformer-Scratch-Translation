@@ -37,6 +37,3 @@ class TransformerTokenizerTrainer:
     
 transformer_tokenizer_trainer = TransformerTokenizerTrainer("C:/Users/vasan/.cache/huggingface/datasets/imdb", "tokenizer.json")
 tokenizer = transformer_tokenizer_trainer.build_tokenizer()
-
-print(tokenizer.decode(tokenizer.encode("1").ids))
-print(tokenizer.decode(tokenizer.encode("i am good").ids))
