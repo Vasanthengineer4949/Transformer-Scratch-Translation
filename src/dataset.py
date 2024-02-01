@@ -31,7 +31,7 @@ class ClassificationDataset(Dataset):
         self.src_cln_name = src_cln_name
         self.tgt_cln_name = tgt_cln_name
         self.dataset_id = dataset_id
-        self.dataset = HFDataset.from_pandas(pd.read_parquet(dataset_id))
+        self.dataset = HFDataset.from_pandas(pd.read_parquet(dataset_id).sample(10000))
         # self.dataset = load_dataset(self.dataset_id, split="train")
         self.sos_token = torch.tensor([tokenizer.token_to_id("[SOS]")]).to(torch.int64)
         self.eos_token = torch.tensor([tokenizer.token_to_id("[EOS]")]).to(torch.int64)
@@ -44,26 +44,22 @@ class ClassificationDataset(Dataset):
 
         data = self.dataset[index]
         src_data = data[self.src_cln_name] # Fetching the source data
-        tgt_data = data[self.tgt_cln_name] # Fetching the target data
+        tgt_data = data[self.src_cln_name] # Fetching the target data
 
-        if tgt_data == 1:
-            tgt_data = "Positive"
+        # if tgt_data == 1:
+        #     tgt_data = "Positive"
         
-        else:
-            tgt_data = "Negative"
+        # else:
+        #     tgt_data = "Negative"
 
         encoder_inp_tokens = torch.tensor(self.tokenizer.encode(src_data).ids).to(torch.int64) # Tokenizing the source data
         decoder_inp_tokens = torch.tensor(self.tokenizer.encode(str(tgt_data)).ids).to(torch.int64) # Tokenizing the target data
 
         if encoder_inp_tokens.size(0) > self.max_seq_len-2:
-            try:
-                encoder_inp_tokens = encoder_inp_tokens[:self.max_seq_len-2]
-            except:
-                encoder_inp_tokens_lst = []
-                for i in range(self.max_seq_len-3):
-                    encoder_inp_tokens_lst.append(encoder_inp_tokens[i])
-                encoder_inp_tokens = torch.Tensor(encoder_inp_tokens_lst)
-                print("Except: ", encoder_inp_tokens_lst.shape)
+            encoder_inp_tokens = encoder_inp_tokens[:self.max_seq_len-2]
+
+        if decoder_inp_tokens.size(0) > self.max_seq_len-1:
+            decoder_inp_tokens = decoder_inp_tokens[:self.max_seq_len-1]
 
         encoder_num_padding_tokens = self.max_seq_len - len(encoder_inp_tokens) - 2 # Calculating the number of source padding tokens
         decoder_num_padding_tokens = self.max_seq_len - len(decoder_inp_tokens) - 1 # Calculating the number of target padding tokens
@@ -77,7 +73,8 @@ class ClassificationDataset(Dataset):
         label_tokens = torch.cat([decoder_inp_tokens, self.eos_token, label_pad_tokens], dim=0) # Label tokens padded
 
         encoder_attn_mask = (encoder_inp_tokens != self.pad_token).unsqueeze(0).unsqueeze(0).to(torch.int64) # Encoder attention mask
-        decoder_attn_mask = (decoder_inpp_tokens != self.pad_token).unsqueeze(0).to(torch.int64) & (torch.triu(torch.ones((1, decoder_inp_tokens.size(0), decoder_inp_tokens.size(0))), diagonal=1).type(torch.int64))==0 # Decoder autoregressive attention mask
+        auto_regressive_mask = torch.triu(torch.ones((1, decoder_inpp_tokens.size(0), decoder_inpp_tokens.size(0))), diagonal=1).type(torch.int64)
+        decoder_attn_mask = (decoder_inpp_tokens != self.pad_token).unsqueeze(0).to(torch.int64) & auto_regressive_mask==0 # Decoder autoregressive attention mask
 
         model_inp = {}
         model_inp["encoder_input_ids"] = encoder_inp_tokens

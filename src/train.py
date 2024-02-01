@@ -1,8 +1,6 @@
 from config import *
 from train_utils import TrainerUtils
-from torch.utils.data import DataLoader
 from tqdm import tqdm
-import torch
 
 class Trainer:
 
@@ -24,7 +22,7 @@ class Trainer:
 
             for data in tqdm(self.train_dataloader, desc=f"Training epoch {epoch}"):
                 loss, self.model, self.optimizer = self.trainer_utils.train_one_step(data, self.model, self.optimizer)
-                train_loss.append(loss)
+                # train_loss.append(loss)
 
                 self.step_num += 1
 
@@ -32,9 +30,9 @@ class Trainer:
 
             self.epoch_num +=1
 
-            saved_message = self.trainer_utils.save_checkpoint(self.model, self.optimizer, self.epoch_num, sum(train_loss)/len(train_loss), self.model_save_path)
+            saved_message = self.trainer_utils.save_checkpoint(self.model, self.optimizer, self.epoch_num, loss, self.model_save_path)
             print(saved_message)
-            print(sum(train_loss)/len(train_loss))
+            print(loss)
 
 trainer = Trainer()
 trainer.train()

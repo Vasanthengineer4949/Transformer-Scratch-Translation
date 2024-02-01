@@ -56,8 +56,8 @@ class PositionalEncoding(nn.Module):
         positions = torch.arange(0, self.seq_len, dtype=torch.float).unsqueeze(1) # Shape: (seq_len) -> (seq_len, 1)
         even_odd_i = torch.arange(0, self.d_model, 2).float() # 2i # Shape: (d_model/2)
         div_freqs_term = torch.pow(10000, even_odd_i/d_model) # 10000**2i/dmodel
-        position_encodings[:, 0::2] = torch.sin(positions/div_freqs_term) # Shape: (seq_len, d_model)
-        position_encodings[:, 1::2] = torch.cos(positions/div_freqs_term) # Shape: (seq_len, d_model)
+        position_encodings[:, 0::2] = torch.sin(positions*div_freqs_term) # Shape: (seq_len, d_model)
+        position_encodings[:, 1::2] = torch.cos(positions*div_freqs_term) # Shape: (seq_len, d_model)
         position_encodings = position_encodings.unsqueeze(0) # Shape: (1, seq_len, d_model)
         self.register_buffer('position_encodings', position_encodings) # to be a part of module state but not a parameter of module
         

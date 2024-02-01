@@ -13,7 +13,7 @@ def translate(sentence: str):
     model = build_transformer_model().to(device)
 
     # Load the pretrained weights
-    state = torch.load("transformer_classifier/epoch-4-checkpoint.pth")
+    state = torch.load("transformer_classifier/epoch-3-checkpoint.pth")
     model.load_state_dict(state['model'])
 
     # if the sentence is a number use it as an index to the test set

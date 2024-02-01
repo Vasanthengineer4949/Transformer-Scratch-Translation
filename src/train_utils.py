@@ -7,7 +7,6 @@ from tokenizers import Tokenizer
 from dataset import ClassificationDataset
 from transformer import build_transformer_model
 from torch.utils.tensorboard import SummaryWriter
-from transformer import build_transformer_model
 import os
 
 class TrainerUtils:
@@ -87,13 +86,16 @@ class TrainerUtils:
             if decoder_inp.size(1) == self.max_seq_len:
                 break
 
-            tgt_attn_mask = torch.triu(torch.ones((1, decoder_inp.size(1), decoder_inp.size(1))), diagonal=1).type(torch.int)
+            tgt_attn_mask = torch.triu(torch.ones((1, decoder_inp.size(1), decoder_inp.size(1))), diagonal=1).type(torch.int64)
 
             out = model(source, src_attn_mask, decoder_inp, tgt_attn_mask)
 
             logits = torch.softmax(out, dim=2)
 
-            next_word_logit_argmax = torch.argmax(logits, dim=2)
+            print(logits[0][0][tokenizer.token_to_id("Positive")])
+            print(logits[0][0][2])
+
+            next_word_logit_argmax = torch.argmax(out, dim=2)
 
             decoder_inp = torch.cat([decoder_inp, torch.empty(1, 1).type_as(source).fill_(next_word_logit_argmax.item()).to(device)], dim=1)
             
