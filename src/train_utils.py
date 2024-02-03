@@ -36,7 +36,7 @@ class TrainerUtils:
 
         self.writer = SummaryWriter(self.logging_dir, comment="First implementation")
         self.optimizer = torch.optim.Adam(self.transformer_model.parameters(), lr = LR)
-        self.loss_fn = nn.CrossEntropyLoss(ignore_index=self.tokenizer.token_to_id('[PAD]'), label_smoothing=0.1).to("cpu")
+        self.loss_fn = nn.CrossEntropyLoss(ignore_index=self.tokenizer.token_to_id('[PAD]')).to("cuda")
 
     def load_dataloaders(self):
         train_dataloader = DataLoader(self.train_classification_dataset, batch_size=self.batch_size, shuffle=True)
@@ -94,6 +94,7 @@ class TrainerUtils:
 
             next_word_logit_argmax = torch.argmax(logits, dim=2)
             next_word_logit_argmax = next_word_logit_argmax[0][-1]
+            print(tokenizer.decode_batch(decoder_inp.tolist()))
 
             decoder_inp = torch.cat([decoder_inp, torch.empty(1, 1).type_as(source).fill_(next_word_logit_argmax.item()).to(device)], dim=1)
             i = i+1
@@ -146,7 +147,7 @@ class TrainerUtils:
         loss.backward()
 
         optimizer.step()
-        optimizer.zero_grad()
+        optimizer.zero_grad(set_to_none=True)
 
         return loss, model, optimizer
     

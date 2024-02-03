@@ -24,7 +24,7 @@ class FeedForward(nn.Module):
 
     def forward(self, x:torch.Tensor):
         linear_1_out = self.linear_1(x) # Linear layer 1 out # Shape: bs,seq_len, d_ff
-        linear_1_out = torch.relu((linear_1_out)) # Applying ReLU activation function
+        linear_1_out = torch.relu(linear_1_out) # Applying ReLU activation function
         linear_1_out = self.ff_dropout_layer(linear_1_out) # Applying Dropout
         ff_out = self.linear_2(linear_1_out) # Linear layer 2 -> FF Block output # Shape: bs,seq_len, d_model
         return ff_out

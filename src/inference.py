@@ -12,7 +12,7 @@ def translate(sentence: str):
     model = build_transformer_model().to(device)
 
     # Load the pretrained weights
-    state = torch.load("transformer_classifier/epoch-4-checkpoint.pth")
+    state = torch.load("transformer_classifier/epoch-3-checkpoint.pth")
     model.load_state_dict(state['model'])
 
     # if the sentence is a number use it as an index to the test set
@@ -34,4 +34,4 @@ def translate(sentence: str):
         model_out = train_utils.generate(model=model, source=source, src_attn_mask=source_mask, tokenizer=tokenizer)
     return model_out
 
-print(translate("I am feeling bad"))
+print(translate("i am delighted"))

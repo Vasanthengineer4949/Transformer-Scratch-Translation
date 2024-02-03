@@ -44,7 +44,7 @@ class MultiHeadAttention(nn.Module):
         '''
         
         # (bs, num_heads, seq_len, head_dim) --> (bs, num_heads, seq_len, seq_len)
-        attention_scores = (query @ key.transpose(-2, -1)) / math.sqrt(self.d_model)
+        attention_scores = (query @ key.transpose(-2, -1)) / math.sqrt(self.head_dim)
 
         if mask is not None:
             # A very low (indicating -inf) to the positions where mask == 0 so that in softmax it becomes 0
